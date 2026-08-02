@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from app.llm import chat
-from app.agent import agent
+from app.agent import agent,agent_stream
+from fastapi.responses import StreamingResponse
 app = FastAPI()
 
 
@@ -24,10 +24,17 @@ def hello():
 
 
 @app.post("/chat")
-def chat_api(req:ChatRequest):
+async def chat_api(req:ChatRequest):
 
     answer = agent(req.message)
 
     return {
         "answer":answer
     }
+@app.post("/stream")
+def stream(req:ChatRequest):
+
+    return StreamingResponse(
+        agent_stream(req.message),
+        media_type="text/plain"
+    )
