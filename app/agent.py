@@ -4,6 +4,11 @@ from app.tools_registry import (
     tool_map
 )
 import json
+import logging
+
+
+logger=logging.getLogger(__name__)
+
 def agent(
     user_input,
     max_iterations=5
@@ -34,12 +39,18 @@ def agent(
 
 
         name=tool_call.function.name
-
+        
 
         args=json.loads(
             tool_call.function.arguments
         )
-
+        logger.info(
+            f"""
+            Tool Calling:
+            name={name}
+            args={args}
+            """
+        )
 
         # 找对应函数
 
@@ -47,8 +58,9 @@ def agent(
 
 
         if func is None:
-
-            return "工具不存在"
+            raise ValueError(
+                f"Unknown tool:{name}"
+            )
 
 
         try:
@@ -106,7 +118,14 @@ def agent_stream(user_input):
         args=json.loads(
             tool_call.function.arguments
         )
-
+        logger.info(
+                    f"""
+                    Tool Calling:
+                    name={name}
+                    args={args}
+                    """
+                )
+        
 
         func=tool_map.get(name)
 
@@ -118,7 +137,7 @@ def agent_stream(user_input):
 
         try:
             result=func(**args)
-
+            
         except Exception as e:
             result=f"工具执行失败:{e}"
 

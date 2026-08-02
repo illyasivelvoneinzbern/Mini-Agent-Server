@@ -1,36 +1,44 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
-from app.agent import agent,agent_stream
+from app.schemas import ChatRequest, ChatResponse
+from app.agent import agent, agent_stream
 from fastapi.responses import StreamingResponse
+
+
 app = FastAPI()
-
-
-class ChatRequest(BaseModel):
-    message: str
 
 
 @app.get("/")
 def root():
+
     return {
-        "message": "Mini Agent Server Running"
+        "message":
+        "Mini Agent Server Running"
     }
 
 
 @app.get("/hello")
 def hello():
+
     return {
-        "msg": "hello"
+        "msg":"hello"
     }
 
 
-@app.post("/chat")
-async def chat_api(req:ChatRequest):
+@app.post(
+    "/chat",
+    response_model=ChatResponse
+)
+async def chat_api(req: ChatRequest):
 
-    answer = agent(req.message)
+    answer = agent(
+        req.message
+    )
 
-    return {
-        "answer":answer
-    }
+    return ChatResponse(
+        answer=answer
+    )
+
+
 @app.post("/stream")
 def stream(req:ChatRequest):
 

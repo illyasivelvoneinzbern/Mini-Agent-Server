@@ -43,3 +43,4 @@ Agent 如何支持多个工具？
 调用工具循环次数需限制，调用不到需要反馈
 agent loop:
 用户请求进入FastAPI，然后Agent调用LLM判断是否需要工具。如果LLM返回tool_call，则解析参数，通过tool_registry找到对应函数执行，再把tool结果加入messages继续调用LLM，直到生成最终答案。
+在实现 Agent streaming 时，遇到了 Python generator 嵌套问题。由于 StreamingResponse 需要消费外层 iterator，直接 return 内层 generator 会导致数据无法正确透传，因此改为遍历内部 generator 并逐chunk yield。
